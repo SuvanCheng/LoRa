@@ -1,5 +1,5 @@
 # LoRa个人学习笔记
-重拾LoRa，将离线笔记搬运到GitHub上来。
+重拾LoRa，将离线笔记搬运到GitHub上来，也算是总结一下这个项目。
 
 ## 总体介绍
 
@@ -7,11 +7,133 @@
 
 ## 相关概念
 
+总的来说：LoRa与LoRaWAN、LoRaWAN的Class A,B,C、LoRaWAN的两种入网方式
+
+
+
+#### LoRa与LoRaWAN
+
+起初我并没有分清LoRa与LoRaWAN，后来发现是非常有必要区分两者：
+
+> LoRa（Long Range）是由法国格勒诺布尔的Cycleo开发并于2012年被Semtech收购的专利数字无线数据通信技术。LoRa使用免许可的亚千兆赫兹无线电频段，如169 MHz，433 MHz，868 MHz（欧洲）和915 MHz（北美）。 LoRa能够以低功耗实现超远距离传输（农村地区超过10公里）。该技术分为两部分：物理层LoRa，和上层LoRaWAN。
+
+> LoRaWAN是LoRa运营的网络，可以被物联网用于远程和非连接行业。 LoRaWAN是媒体访问控制（MAC）层协议，但主要是用于管理LPWAN网关和端节点设备之间的通信的网络层协议，作为由LoRa联盟维护的路由协议。 LoRaWAN规范1.0版于2015年6月发布。从基本的角度来说，人们可以认为LoRaWAN是一个新的WiFi，可以连接各个行业的新物联网设备。
+
+| 区别 | LoRa                                                        | LoRaWAN                                                      |
+| ---- | ----------------------------------------------------------- | ------------------------------------------------------------ |
+| 本质 | LoRa是Semtech的 LoRa 芯片使用的chirp扩频（CSS）的调制技术。 | LoRaWAN是一种媒体访问控制（MAC）层协议，是一种拥有广泛覆盖能力的无线网络。 |
+| 应用 | 鲁棒调制，实现不同数据速率。                                | LPWAN，具有广泛覆盖能力的低功耗无线网络。                    |
+| 位置 | LoRa系统的物理层（PHY）                                     | LoRaWAN四层结构：RF、PHY、MAC、Application                   |
+
+> LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构中，LoRa网关是一个透明的中继，连接前端终端设备和后端中央服务器。网关与服务器通过标准IP连接，而终端设备采用单跳与一个或多个网关通信，所有的节点均是双向通信。
+
+#### LoRaWAN的Class A、Class B、Class C
+
+- Class A（可双向通讯的终端装置）即时性最好
+
+  用于需要以最低功耗操作的终端装置。
+
+  这种装置常常在它送出 uplink 之后，只需要与 server 端进行很短暂的 downlink 通讯 (例如只收个ACK 而已)
+
+  在任何其他时间，从 server downlink 必须等到下一次的 scheduled uplink (所以通讯没办法很即时，例如下一次的 scheduled uplink 可能是在128秒之后)
+
+- Class B（可双向通讯的终端装置，但有 scheduled receive slots）
+
+  相较于 A 类的随机 receive windows，Class B 的装置会在排程的时间打开一个额外的接收窗。为了让终端装置在排程时间打开它的 receive window，它需要从 gateway 接收一个用于时间同步的 Beacon (如此一来，server 就能知道终端装置何时在 listening)，相较于 A 类会更即时。
+
+- Class C（可双向通讯的终端装置，尽可能安排最多的 receive slots）
+
+  C 类的终端装置是几乎连续地开着 receive windows，只有在发送时才会关闭接收视窗
+
+  C 类对 server 与终端装置通讯带来最低的延迟 (latency)，所以即时性最好，但消耗功率最高
+
+**项目中使用最低功耗的Class A**
+
+#### LoRaWAN的两种入网方式
+
+ABP（activation by personalization）
+
+- DevAddr、NwkSKey 与 AppSKey 是直接储存在装置上的；
+- 每个装置都有自己的 NwkSKey 与 AppSKey，这样泄漏一个装置的密钥，不会牵连到其他装置。
+
+OTAA（over-the-air activation）
+
+- DevEUI、AppEUI、AppKey 金钥这三个东西，AppKey 的目的是为了产生 NwkSKey 与 AppSKey。
+- 接着由 End Device 发起请求，进行入网程序。
+- 过程中如果失去 session context，必须重新跑 Join Procedure。
+
+**项目中使用最低功耗的OTAA**
+
+
+
+
+
 
 
 
 
 ## 关键参数
+
+总的来说：扩频因子(SF)，编码率(CR)，带宽(BW)，信噪比(SNR)，接收的信号强度指示(RSSI)，等效全向辐射功率(EIRP)，速率自适应(ADR)，OVSF:OrthogonalVariableSpreadingFactor，正交可变扩频因子
+
+> 通过调整扩频因子和纠错率：最终在带宽占用、数据速率、链路预算改善以及抗干扰性之间达到最佳平衡
+
+- SF(SpreadingFactor) 扩频因子
+
+  当扩频因子为1时，数据1就用“1”来表示，扩频因子为4时，可能用“1011”来表示1；这样传输的目的是降低误码率也就是信噪比，但是却减少了可以传输的实际数据，所以，扩频因子越大，传输的数据数率就越小。简而言之：**扩大带宽、减少干扰**
+
+  当扩频因子为4时，有4个正交的扩频码，正交的扩频码可以让同时传输的无线信号互不干扰，也就是说，扩频因子为4时，可以同时传输4个人的信息。简而言之：**根据对速率的不同要求分配不同数量的码道，提高利用率**
+
+  > 扩频因子越大，传播时间越长，传播距离越广
+
+- CR(code rate) 编码率
+
+
+- RF(radio frequency) 发射频率
+
+- (radio ) 发射功率
+
+  > 提高通信距离常用的办法是提高发射功率，同时也带来更多的能耗。
+
+
+
+- Band Width(BW) 调制带宽
+
+  带宽就是单位时间内的最大数据流量，也可以说是单位时间内最大可能提供多少个二进制位传输。
+
+  > 1M带宽指的是1Mbps=1 megabits per second
+  >
+  > 增加信号带宽，可以提高有效数据速率缩短传输时间，但会牺牲灵敏度
+
+- SNR(Signal-to-noise ratio) 信噪比
+
+  SNR 是一个正的dBm，表示信号比噪声的强度。SNR 越大，说明混在信号里的噪声越小，否则相反。
+
+  > 典型实例：SNR至少比RSSI高20~25dB。
+
+
+
+- RSSI (Received Signal Strength Indication) 接收的信号强度指示
+
+  RSSI 是一个负的dBm，表示RF信号的数值。信号越强，连线品质越好。因此RSSI越接近于0越好。
+
+  > -60dBm的信号比-80dBm的品质好。
+
+
+
+- EIRP(equivalent isotropically radiated power)等效全向辐射功率 或叫有效全向辐射功率
+
+
+
+- 速率自适应(ADR)
+
+LoRaWAN网络服务器通过一种速率自适应（ADR）方案来控制数据传输速率和每一终端设备的射频输出。
+
+
+
+#### 传输速率与通讯距离
+
+LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越远。
 
 
 
@@ -29,35 +151,35 @@
 
 * 因为无法访问外网，所以首先修改树莓派的更新源
 
-```shell
-sudo nano /etc/apt/sources.list
-```
+    ```shell
+    sudo nano /etc/apt/sources.list
+    ```
 
-```sh
-# deb http://raspbian.raspberrypi.org/raspbian/ stretch main contrib non-free rpi
-# Uncomment line below then 'apt-get update' to enable 'apt-get source'
-# deb-src http://raspbian.raspberrypi.org/raspbian/ stretch main contrib non-free rpi
-# use ustc mirror:
-# deb http://mirrors.aliyun.com/raspbian/raspbian/ stretch main non-free contrib rpi
-# deb-src http://mirrors.aliyun.com/raspbian/raspbian/ stretch main non-free contrib rpi
-deb http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ stretch main contrib non-free rpi
-deb-src http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ stretch main contrib non-free rpi
-```
+    ```sh
+    # deb http://raspbian.raspberrypi.org/raspbian/ stretch main contrib non-free rpi
+    # Uncomment line below then 'apt-get update' to enable 'apt-get source'
+    # deb-src http://raspbian.raspberrypi.org/raspbian/ stretch main contrib non-free rpi
+    # use ustc mirror:
+    # deb http://mirrors.aliyun.com/raspbian/raspbian/ stretch main non-free contrib rpi
+    # deb-src http://mirrors.aliyun.com/raspbian/raspbian/ stretch main non-free contrib rpi
+    deb http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ stretch main contrib non-free rpi
+    deb-src http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ stretch main contrib non-free rpi
+    ```
 
-```shell
-sudo apt-get update
-sudo nano /etc/apt/sources.list.d/raspi.list
-```
+    ```shell
+    sudo apt-get update
+    sudo nano /etc/apt/sources.list.d/raspi.list
+    ```
 
-```shell
-# deb http://archive.raspberrypi.org/debian/ stretch main ui
-# Uncomment line below then 'apt-get update' to enable 'apt-get source'
-# deb-src http://archive.raspberrypi.org/debian/ stretch main ui
-# use ustc mirror:
-deb http://mirrors.aliyun.com/debian/ stretch main ui
-deb-src http://mirrors.aliyun.com/debian/ stretch main ui
-
-```
+    ```shell
+    # deb http://archive.raspberrypi.org/debian/ stretch main ui
+    # Uncomment line below then 'apt-get update' to enable 'apt-get source'
+    # deb-src http://archive.raspberrypi.org/debian/ stretch main ui
+    # use ustc mirror:
+    deb http://mirrors.aliyun.com/debian/ stretch main ui
+    deb-src http://mirrors.aliyun.com/debian/ stretch main ui
+    
+    ```
 
 * 安装 minicom
 
@@ -235,9 +357,9 @@ deb-src http://mirrors.aliyun.com/debian/ stretch main ui
   Baud = 9600
   ```
 
-  *99#：中国联通的WCDMA的拨号网络号码
-
-  Ctrl + O：保存修改的文件
+  > *99#：中国联通的WCDMA的拨号网络号码
+  >
+  > Ctrl + O：保存修改的文件
 
 * 拨号上网！
 
