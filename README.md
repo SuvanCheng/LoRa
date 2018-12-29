@@ -520,6 +520,12 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
   sudo apt-get install -y nodejs
   ```
 
+  如果失败，可能是没有安装 curl ：curl 是利用URL语法在命令行方式下工作的开源文件传输工具。它被广泛应用在Unix、多种Linux发行版中，并且有DOS和Win32、Win64下的移植版本
+
+  ```shell
+  sudo apt-get install curl
+  ```
+
 - 安装 git
 
   ```shell
@@ -647,7 +653,14 @@ Manage palette，安装 node-red-dashboard & node-red-node-pi-gpiod
 ​	LoRa通信对供电的纯净性有比较高的要求，虽然芯片能够对电源噪声进行抑制，但LoRa灵敏度实在太高(-135 dBm~-148 dBm，Zig-Bee也只能低至-96 dBm，白噪声主要分布在-120 dBm)，让我们不得不极为重视GND的纯净性。因此有两个对策：
 
 - 一般使用纹波/噪声比较小的LDO或者线性稳压器件，以降低噪声，减少发热量（当然控制好压差）；
-
 - LDO输出的GND与SX1276/78的GND PAD非常接近。
+
+#### [在Ubuntu中，有时候运用sudo  apt-get install 安装软件时，会出现一下的情况](http://blog.csdn.net/u011596455/article/details/60322568)
+
+E: Could not get lock /var/lib/dpkg/lock - open (11: Resource temporarily unavailable)
+
+E: Unable to lock the administration directory (/var/lib/dpkg/), is another process using it?
+
+
 
 ### Other
