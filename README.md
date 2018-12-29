@@ -3,6 +3,8 @@
 
 ## 项目介绍
 
+这是大三开始的一个“蜻蜓点水”项目，主要涉及LoRa、STM32、树莓派、Node.js
+
 [TOC]
 
 
@@ -64,7 +66,7 @@ OTAA（over-the-air activation）
 - 接着由 End Device 发起请求，进行入网程序。
 - 过程中如果失去 session context，必须重新跑 Join Procedure。
 
-**项目中使用最低功耗的OTAA**
+**项目中使用OTAA**
 
 
 
@@ -140,7 +142,7 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 
 ## 三、系统搭建
 
-### 网关(树莓派)
+### 网关(Raspberry PI)
 
 #### 安装LoRa网关
 
@@ -315,42 +317,7 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
   下列【新】软件包将被安装：
     libpcap0.8 libuniconf4.6 libwvstreams4.6-base libwvstreams4.6-extras ppp wvdial
   升级了 0 个软件包，新安装了 6 个软件包，要卸载 0 个软件包，有 14 个软件包未被升级。
-  需要下载 893 kB/1,216 kB 的归档。
-  解压缩后会消耗 3,297 kB 的额外空间。
-  您希望继续执行吗？ [Y/n] y
-  获取:1 http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian stretch/main armhf libpcap0.8 armhf 1.8.1-3 [123 kB]
-  获取:2 http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian stretch/main armhf libwvstreams4.6-base armhf 4.6.1-11 [193 kB]
-  获取:3 http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian stretch/main armhf libwvstreams4.6-extras armhf 4.6.1-11 [330 kB]
-  获取:4 http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian stretch/main armhf libuniconf4.6 armhf 4.6.1-11 [139 kB]
-  获取:5 http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian stretch/main armhf wvdial armhf 1.61-4.1 [107 kB]
-  已下载 893 kB，耗时 2秒 (353 kB/s)
-  正在预设定软件包 ...
-  正在选中未选择的软件包 libpcap0.8:armhf。
-  (正在读取数据库 ... 系统当前共安装有 124818 个文件和目录。)
-  正准备解包 .../0-libpcap0.8_1.8.1-3_armhf.deb  ...
-  正在解包 libpcap0.8:armhf (1.8.1-3) ...
-  正在选中未选择的软件包 libwvstreams4.6-base。
-  正准备解包 .../1-libwvstreams4.6-base_4.6.1-11_armhf.deb  ...
-  正在解包 libwvstreams4.6-base (4.6.1-11) ...
-  正在选中未选择的软件包 libwvstreams4.6-extras。
-  正准备解包 .../2-libwvstreams4.6-extras_4.6.1-11_armhf.deb  ...
-  正在解包 libwvstreams4.6-extras (4.6.1-11) ...
-  正在选中未选择的软件包 libuniconf4.6。
-  正准备解包 .../3-libuniconf4.6_4.6.1-11_armhf.deb  ...
-  正在解包 libuniconf4.6 (4.6.1-11) ...
-  正在选中未选择的软件包 ppp。
-  正准备解包 .../4-ppp_2.4.7-1+4_armhf.deb  ...
-  正在解包 ppp (2.4.7-1+4) ...
-  正在选中未选择的软件包 wvdial。
-  正准备解包 .../5-wvdial_1.61-4.1_armhf.deb  ...
-  正在解包 wvdial (1.61-4.1) ...
-  正在处理用于 libc-bin (2.24-11+deb9u3) 的触发器 ...
-  正在设置 libwvstreams4.6-base (4.6.1-11) ...
-  正在处理用于 systemd (232-25+deb9u2) 的触发器 ...
-  正在处理用于 man-db (2.7.6.1-2) 的触发器 ...
-  正在设置 libpcap0.8:armhf (1.8.1-3) ...
-  正在设置 ppp (2.4.7-1+4) ...
-  Created symlink /etc/systemd/system/multi-user.target.wants/pppd-dns.service → /lib/systemd/system/pppd-dns.service.
+  ...省略...
   正在设置 libwvstreams4.6-extras (4.6.1-11) ...
   正在设置 libuniconf4.6 (4.6.1-11) ...
   正在设置 wvdial (1.61-4.1) ...
@@ -420,23 +387,7 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
   sudo nano /etc/wvdial.conf
   ```
 
-  修改三个引号行
-
-  ```shell
-  [Dialer Defaults]
-  Init1 = ATZ
-  Init2 = ATQ0 V1 E1 S0=0
-  Modem Type = Analog Modem
-  ; Phone = <Target Phone Number>
-  ISDN = 0
-  ; Password = <Your Password>
-  New PPPD = yes
-  ; Username = <Your Login Name>
-  Modem = /dev/ttyUSB0
-  Baud = 9600
-  ```
-
-  我的修改如下：
+  修改三个引号行，我的修改如下：
 
   ```shell
   [Dialer Defaults]
@@ -462,18 +413,241 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
   sudo wvdial
   ```
 
-### 节点(STM32)
+#### 玻璃钢天线
 
-#### 浊度
 
-#### PH计
 
-#### 温度
+
+
+### 节点(STM32L151)
+
+#### 主机板
+
+##### 普通版 (WisNode)
+
+无论普通还是升级，网关配置完成后的第一步：填appkey
+
+对应TTN的设置，修改：LORAWAN_DEVICE_EUI 与 LORAWAN_APPLICATION_KEY
+
+```c
+#define LORAWAN_DEVICE_EUI                          { IEEE_OUI, 0xFF, 0xFE, 0xFD, 0xFC, 0x02 }
+																										//Modifications in the case of mass production
+/*!	
+ * Application IEEE EUI (big endian)
+ */
+#define LORAWAN_APPLICATION_EUI                     { 0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x88, 0xA8 }
+                                                     //70b3d57ef00046a4   70B3D57E D0007DFA
+/*!
+ * AES encryption/decryption cipher application key
+ */
+#define LORAWAN_APPLICATION_KEY                     { 0x73, 0xB6, 0x49, 0xCD, 0xA4, 0x90, 0x1E, 0x9F, 0xBC, 0xE5, 0xCD, 0x68, 0x68, 0xB6, 0x14, 0xC8 }
+                                                     //Modifications in the case of mass production
+```
+
+##### 升级版 (Tracker Node)
+
+#### 外围
+
+##### [浊度传感器](https://item.taobao.com/item.htm?spm=a1z09.2.0.0.593e2e8dtuesUp&id=530303920152&_u=eo8d3095bd5)
+
+##### PH计传感器
+
+##### 温度传感器
 
 ## 四、上位机
 
-### [The Things Network(服务器)](https://console.thethingsnetwork.org/applications/suvan/data)
+### [服务器 (The Things Network)](https://console.thethingsnetwork.org/applications/suvan/data)
 
-### VPS
+#### [Payload结构](https://mydevices.com/cayenne/docs/lora/#lora-cayenne-low-power-payload)
+
+#### 数据类型
+
+| 通道 | 类型 | Object               | 量纲     |
+| ---- | :--: | -------------------- | -------- |
+| 01   |  88  | GPS 定位             | 定位 N/A |
+| 02   |  67  | Temperature 温度     | °C       |
+| 03   |  03  | Analog Output 电量   | mv       |
+| 04   |  71  | Accelerometer 加速度 | g        |
+| 05   |  7E  | Acidity 酸碱PH值     | N/A      |
+| 06   |  7F  | Conductivity 电导率  | uS/cm    |
+| 07   |  96  | Turbidity 水质浊度   | NTU      |
+| 08   |  97  | COD 化学需氧量       | mg/L     |
+
+### 阿里云VPS
+
+##### [CentOS 7 安装 MATE 桌面环境](http://blog.csdn.net/m0_37876745/article/details/78188848)
+
+- 安装 X Window System
+
+  ```shell
+  yum groups install "X Window System"
+  ```
+
+- 安装 MATE Desktop
+
+  ```powershell
+  yum groups install "MATE Desktop"
+  ```
+
+- 设置默认通过桌面环境启动服务器
+
+  ```shell
+  systemctl set-default graphical.target
+  ```
+
+- 重启服务器
+
+  ```shell
+  reboot
+  ```
+
+  ```shell
+  systemctl set-default multi-user.target  //设置成命令模式
+  systemctl set-default graphical.target  //设置成图形模式
+  ```
+
+
+
+
+### 服务平台 (Node.js)
+
+#### 局域网 Ubuntu 配置Node.js环境
+
+- 安装 Node.js
+
+  ```shell
+  curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+  sudo apt-get install -y nodejs
+  ```
+
+- 安装 git
+
+  ```shell
+  sudo apt-get install git
+  ```
+
+- 创建工程目录
+
+  ```
+  mkdir Filename
+  ```
+
+- [安装 The Things Network Node.js Application SDK](https://www.npmjs.com/package/ttn)
+
+  ```shell
+  cd Filename
+  npm install --save ttn
+  ```
+
+- [创建脚本文件 For example](https://www.npmjs.com/package/ttn)
+
+  ```shell
+  第一行注掉：
+  //import { data, application } from "ttn"
+  第二行添加：
+  let ttn = require("ttn");
+  let data = ttn.data;
+  let application = ttn.application;
+  ```
+
+  多谢 3-304 马斌老师！
+
+#### 阿里云 CentOS 配置Node.js环境
+
+
+
+
+
+### 简易平台(Node-RED)
+
+#### 本地 Node-RED(Raspberry PI)
+
+树莓派本身预安装Node-RED，所以只需要[update](https://www.ibm.com/developerworks/cn/cloud/library/cl-cn-bluemix-nodered/index.html)
+
+```shell
+update-nodejs-and-nodered
+```
+
+
+
+```shell
+All done.
+  You can now start Node-RED with the command  node-red-start
+  or using the icon under   Menu / Programming / Node-RED
+  Then point your browser to localhost:1880 or http://{your_pi_ip-address}:1880
+```
+
+
+
+```shell
+cd ~/.node-red
+sudo npm install -g node-red-admin
+```
+
+
+
+```shell
+node-red-admin hash-pw
+```
+
+把密码记好
+
+```shell
+Password: 
+$2a$08$ysZq7ivCwbQBNCCsvSJ89u1IUzskYfchCnoLVIm7KySLIqI5vqvDu
+```
+
+```
+nano ~/.node-red/settings.js
+```
+
+![](D:\Documents\GitHub\LoRa\pic\nide-red.png)
+
+```shell
+sudo systemctl enable nodered.service
+sudo reboot
+```
+
+#### 云端 Node-RED (阿里云)
+
+安装Node-red
+
+
+
+注意，阿里云需要打开1880端口
+
+> 管理控制台 -->  产品与服务  -->  安全组规则 -->  入方向  -->  添加自定义 TCP
+
+#### Node-red 点亮 led
+
+开启：node-red，打开http://192.168.0.108:1880/
+
+> 192.168.0.108是树莓派在局域网的IP地址
+
+Manage palette，安装 node-red-dashboard & node-red-node-pi-gpiod
+
+实例
+
+```json
+[{"id":"7c1e7b4b.da34e4","type":"rpi-gpio out","z":"1fe5d95c.88e647","name":"led","pin":"7","set":true,"level":"0","freq":"100","out":"out","x":810,"y":340,"wires":[]},{"id":"8b812881.120738","type":"ui_switch","z":"1fe5d95c.88e647","name":"","label":"LED","group":"f94ed544.fa12c8","order":0,"width":0,"height":0,"passthru":false,"decouple":"false","topic":"","style":"","onvalue":"true","onvalueType":"bool","onicon":"","oncolor":"","offvalue":"false","offvalueType":"bool","officon":"","offcolor":"","x":430,"y":340,"wires":[["dd1b0223.69643"]]},{"id":"dd1b0223.69643","type":"change","z":"1fe5d95c.88e647","name":"","rules":[{"t":"change","p":"payload","pt":"msg","from":"true","fromt":"bool","to":"1","tot":"num"},{"t":"change","p":"payload","pt":"msg","from":"false","fromt":"bool","to":"0","tot":"num"}],"action":"","property":"","from":"","to":"","reg":false,"x":620,"y":340,"wires":[["7c1e7b4b.da34e4"]]},{"id":"f94ed544.fa12c8","type":"ui_group","z":"","name":"Switch","tab":"d010dc9f.a4fc1","order":1,"disp":true,"width":"6"},{"id":"d010dc9f.a4fc1","type":"ui_tab","z":"","name":"My PI3b","icon":"dashboard","order":1}]
+```
+
+打开 dashboard，完成
+
+
+
+
 
 ## 五、其它
+
+### Q&A
+
+#### [LoRa通信模块为什么封装都有一个2mm的通孔，LDO为什么距离模块那么近？](http://bbs.21ic.com/icview-2542492-1-1.html)
+
+​	LoRa通信对供电的纯净性有比较高的要求，虽然芯片能够对电源噪声进行抑制，但LoRa灵敏度实在太高(-135 dBm~-148 dBm，Zig-Bee也只能低至-96 dBm，白噪声主要分布在-120 dBm)，让我们不得不极为重视GND的纯净性。因此有两个对策：
+
+- 一般使用纹波/噪声比较小的LDO或者线性稳压器件，以降低噪声，减少发热量（当然控制好压差）；
+
+- LDO输出的GND与SX1276/78的GND PAD非常接近。
+
+### Other
