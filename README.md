@@ -134,7 +134,9 @@ LoRaWAN网络服务器通过一种速率自适应（ADR）方案来控制数据�
 
 #### 传输速率与通讯距离
 
-LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越远。![](/img/Data_Rate.jpg "传输速率与通讯距离")][zhihu]
+LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越远。
+
+![](D:\Documents\GitHub\LoRa\img\Data_Rate.png)
 
 ## 三、系统搭建
 
@@ -663,7 +665,13 @@ E: Could not get lock /var/lib/dpkg/lock - open (11: Resource temporarily unavai
 
 E: Unable to lock the administration directory (/var/lib/dpkg/), is another process using it?
 
+#### LoRa为什么Radio层传输速率越快，通信距离越短?
 
+从以下表格可以看出SF=9相对7的时候，SNR灵敏度提高了5dB，SF=12时候更是提高12.5dB。从无线电传输公式可以得知：
+
+> 传输损耗(dB)= 20lgF（MHz）+20lgD(km)+经验常数
+
+SNR越大，意味着通信链路预算值越高，也意味着传输距离更远。用经验公式推断：增加6dB的链路预算，可以提高大约2km的传输距离（实际情况会发现，增加12dB并没有获得更多的通信距离，这是还有其他的参量发生作用，在此不详细讨论）  
 
 ### Other
 
