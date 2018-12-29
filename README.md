@@ -1,17 +1,19 @@
 # LoRa个人学习笔记
 重拾LoRa，将离线笔记搬运到GitHub上来，也算是总结一下这个项目。
 
-## 总体介绍
+## 项目介绍
+
+[TOC]
 
 
 
-## 相关概念
+## 一、相关概念
 
 总的来说：LoRa与LoRaWAN、LoRaWAN的Class A,B,C、LoRaWAN的两种入网方式
 
 
 
-#### LoRa与LoRaWAN
+### LoRa与LoRaWAN
 
 起初我并没有分清LoRa与LoRaWAN，后来发现是非常有必要区分两者：
 
@@ -72,64 +74,63 @@ OTAA（over-the-air activation）
 
 
 
-## 关键参数
+## 二、关键参数
 
-总的来说：扩频因子(SF)，编码率(CR)，带宽(BW)，信噪比(SNR)，接收的信号强度指示(RSSI)，等效全向辐射功率(EIRP)，速率自适应(ADR)，OVSF:OrthogonalVariableSpreadingFactor，正交可变扩频因子
+总的来说：扩频因子(SF)，编码率(CR)，带宽(BW)，信噪比(SNR)，接收的信号强度指示(RSSI)，等效全向辐射功率(EIRP)，速率自适应(ADR)，OVSF: Orthogonal Variable Spreading Factor，正交可变扩频因子
+
+### Lora技术用语解析
+
+设置各种参数的目的
 
 > 通过调整扩频因子和纠错率：最终在带宽占用、数据速率、链路预算改善以及抗干扰性之间达到最佳平衡
 
-- SF(SpreadingFactor) 扩频因子
+#### SF(SpreadingFactor) 扩频因子
 
-  当扩频因子为1时，数据1就用“1”来表示，扩频因子为4时，可能用“1011”来表示1；这样传输的目的是降低误码率也就是信噪比，但是却减少了可以传输的实际数据，所以，扩频因子越大，传输的数据数率就越小。简而言之：**扩大带宽、减少干扰**
+当扩频因子为1时，数据1就用“1”来表示，扩频因子为4时，可能用“1011”来表示1；这样传输的目的是降低误码率也就是信噪比，但是却减少了可以传输的实际数据，所以，扩频因子越大，传输的数据数率就越小。简而言之：**扩大带宽、减少干扰**
 
-  当扩频因子为4时，有4个正交的扩频码，正交的扩频码可以让同时传输的无线信号互不干扰，也就是说，扩频因子为4时，可以同时传输4个人的信息。简而言之：**根据对速率的不同要求分配不同数量的码道，提高利用率**
+当扩频因子为4时，有4个正交的扩频码，正交的扩频码可以让同时传输的无线信号互不干扰，也就是说，扩频因子为4时，可以同时传输4个人的信息。简而言之：**根据对速率的不同要求分配不同数量的码道，提高利用率**
 
-  > 扩频因子越大，传播时间越长，传播距离越广
-
-- CR(code rate) 编码率
-
-
-- RF(radio frequency) 发射频率
-
-- (radio ) 发射功率
-
-  > 提高通信距离常用的办法是提高发射功率，同时也带来更多的能耗。
+> 扩频因子越大，传播时间越长，传播距离越广
 
 
 
-- Band Width(BW) 调制带宽
+#### CR(code rate) 编码率
 
-  带宽就是单位时间内的最大数据流量，也可以说是单位时间内最大可能提供多少个二进制位传输。
+RF(radio frequency) 发射频率
 
-  > 1M带宽指的是1Mbps=1 megabits per second
-  >
-  > 增加信号带宽，可以提高有效数据速率缩短传输时间，但会牺牲灵敏度
+#### 发射功率
 
-- SNR(Signal-to-noise ratio) 信噪比
-
-  SNR 是一个正的dBm，表示信号比噪声的强度。SNR 越大，说明混在信号里的噪声越小，否则相反。
-
-  > 典型实例：SNR至少比RSSI高20~25dB。
+> 提高通信距离常用的办法是提高发射功率，同时也带来更多的能耗。
 
 
 
-- RSSI (Received Signal Strength Indication) 接收的信号强度指示
+#### Band Width(BW) 调制带宽
 
-  RSSI 是一个负的dBm，表示RF信号的数值。信号越强，连线品质越好。因此RSSI越接近于0越好。
+带宽就是单位时间内的最大数据流量，也可以说是单位时间内最大可能提供多少个二进制位传输。
 
-  > -60dBm的信号比-80dBm的品质好。
+> 1M带宽指的是1Mbps=1 megabits per second
+>
+> 增加信号带宽，可以提高有效数据速率缩短传输时间，但会牺牲灵敏度
+
+#### SNR(Signal-to-noise ratio) 信噪比
+
+SNR 是一个正的dBm，表示信号比噪声的强度。SNR 越大，说明混在信号里的噪声越小，否则相反。
+
+> 典型实例：SNR至少比RSSI高20~25dB。
+
+#### RSSI (Received Signal Strength Indication) 接收的信号强度指示
+
+RSSI 是一个负的dBm，表示RF信号的数值。信号越强，连线品质越好。因此RSSI越接近于0越好。
+
+> -60dBm的信号比-80dBm的品质好。
 
 
 
-- EIRP(equivalent isotropically radiated power)等效全向辐射功率 或叫有效全向辐射功率
+EIRP(equivalent isotropically radiated power)等效全向辐射功率 或叫有效全向辐射功率
 
-
-
-- 速率自适应(ADR)
+#### 速率自适应(ADR)
 
 LoRaWAN网络服务器通过一种速率自适应（ADR）方案来控制数据传输速率和每一终端设备的射频输出。
-
-
 
 #### 传输速率与通讯距离
 
@@ -137,15 +138,109 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 
 
 
-## 工程改动
+## 三、系统搭建
 
+### 网关(树莓派)
 
+#### 安装LoRa网关
 
-## 相关外设
+##### 安装树莓派系统
 
+- 磁盘写入工具：etcher
 
+- SSH服务安装与开机自动启动
 
-### 华为ME909s-821
+  打开  /etc/rc.local文件；
+
+  在语句exit 0之前加入：
+
+  ```shell
+  /etc/init.d/ssh start
+  ```
+
+- 给只读文件加上写权限
+
+  ```
+  sudo chmod a+w filename
+  ```
+
+  同理，给只读文件加上可执行权限
+
+  ```shell
+  sudo chmod a+x filename
+  ```
+
+- 树莓派3-配置-通过VNC访问系统
+
+  ```shell
+  sudo apt-get install tightvncserver
+  ```
+
+  设置密码，等等，省略好多可以忽略的步骤。。。
+
+  使用如下命令手工启动VNC服务器程序
+
+  ```shell
+  tightvncserver -geometry 800x600 :1
+  ```
+
+  然后就可以去同局域网的PC端访问了，密码就是刚才设置的。
+
+- 预设值wifi密码
+
+  打开  /etc/wpa_supplicant/wpa_supplicant.conf
+
+  ```shell
+  ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+  update_config=1
+  country=GB
+  
+  network={
+  	ssid="family"
+  	psk="416liuliuliu"
+  	key_mgmt=WPA-PSK
+  }
+  
+  network={
+  	ssid="nkbh_micromouse"
+  	psk="115115115115"
+  	key_mgmt=WPA-PSK
+  }
+  ```
+
+- 更改键盘布局
+
+  树莓派(raspberry pi)是英国产品，默认键盘布局是英国(GB)，我们用的键盘布局一般是美国(US)
+
+  ```shell
+  sudo dpkg-reconfigure keyboard-configuration
+  ```
+
+  进入后，选通用的101键PC键盘；
+
+  按tab键，到OK，按Enter确定
+
+  在键盘layout选择中，选Other；
+
+  按tab键，到OK，按Enter确定
+
+  然后在选项中，选English(US)；
+
+  按tab键，到OK，按Enter确定
+
+  再选English(US, alternative international)；
+
+  按tab键，到OK，按Enter确定
+
+  然后一路按OK；
+
+  最后，重启系统
+
+  ```shell
+  sudo reboot
+  ```
+
+#### 华为ME909s-821
 
 ​	由于项目需求，LoRaWAN网关必须安装到郊外，意味着Raspberry PI 无法使用WIFI联网，目前的代替方案是：Huawei ME909s-821 4G模块。话不多说，Raspberry PI 开始：
 
@@ -367,6 +462,18 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
   sudo wvdial
   ```
 
+### 节点(STM32)
 
-## 上位机
+#### 浊度
 
+#### PH计
+
+#### 温度
+
+## 四、上位机
+
+### [The Things Network(服务器)](https://console.thethingsnetwork.org/applications/suvan/data)
+
+### VPS
+
+## 五、其它
