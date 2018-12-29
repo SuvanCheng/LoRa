@@ -136,7 +136,7 @@ LoRaWAN网络服务器通过一种速率自适应（ADR）方案来控制数据�
 
 LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越远。
 
-![](D:\Documents\GitHub\LoRa\img\Data_Rate.png)
+![](/img/Data_Rate.png)
 
 ## 三、系统搭建
 
