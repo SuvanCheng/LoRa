@@ -10,6 +10,7 @@
 这是大三开始的项目，书面称作 **`城市河道排污在线监测系统`**
 通常我叫做**`蜻蜓点水`**项目，因为内容虚胖，多是浮光掠影。😀
 主要涉及`LoRa`、`SX1301`、`SX1278`、`STM32L151`、`Raspberry PI`、`Node.js`
+
 * [x] 水质监测（浊度、PH值、水温）💧
 * [x] LoRaWAN 系统 10 km覆盖 🛫
 * [x] 监测中心（预警、统计）📈
@@ -145,10 +146,6 @@ $$
 DR=SF\times(\frac{BW}{2^{SF}})\times CR
 $$
 
-
-
-
-
 - 编码率 CR (code rate)
 
   编码率：数据流中有用部分(非冗余)的比例，如果[编码率](https://zh.wikipedia.org/wiki/%E7%BC%96%E7%A0%81%E7%8E%87)是k/n，则对每k位有用信息，编码器总共产生n位的数据，其中n-k是多余的。
@@ -164,13 +161,11 @@ $$
 
   在存在干扰的情况下，前向纠错能有效提高链路的可靠性。由此，编码率(抗干扰性能)可以随着信道条件的变化而变化—可以选择在报头中加入编码率以便接收端能够解析。
 
-- 发射频率 RF (radio frequency)
-
 - 发射功率
 
   > 提高通信距离常用的办法是提高发射功率，同时也带来更多的能耗。
 
-- Band Width(BW) 调制带宽
+- 调制带宽 BW (Band Width)
 
   带宽就是单位时间内的最大数据流量，也可以说是单位时间内最大可能提供多少个二进制位传输。
 
@@ -192,7 +187,7 @@ $$
 
   > -60dBm的信号比-80dBm的品质好。
 
-- EIRP(equivalent isotropically radiated power)等效全向辐射功率 或叫有效全向辐射功率
+- 等效全向辐射功率 或叫有效全向辐射功率 EIRP (equivalent isotropically radiated power)
 
 
 - 速率自适应(ADR)
@@ -554,6 +549,10 @@ static uint8_t AppDataSize = LORAWAN_APP_DATA_SIZE;
 
 ​	STM32L151/152器件利用Cortex-M3内核和频率介于32 kHz至32 MHz的CPU时钟扩展了超低功耗理念，并且不会降低性能。除了动态运行和低功耗运行模式以外，还有另外2种超低功耗模式为您带来了极低的功耗，同时还能保持RTC、后备寄存器内容与低压检测器的工作。项目主要使用的特性为片上集成的快速12位1 MSPS ADC。
 
+<p align="right">
+    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+</p>
+
 #### 主控STM32L151
 
 - 普通版 (WisNode)
@@ -683,9 +682,9 @@ uint32_t CustomizeMeasureVolage( uint32_t channel )
 ## 上位机
 
 <p align="right">
-    🚀 <a href="#项目概述" target="_blank">回到顶部</a> | 
-    🌾 <a href="README.md">English</a>
+    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
 </p>
+
 服务器 (The Things Network)
 
 [The Things Network](https://console.thethingsnetwork.org/applications/suvan/data)
@@ -796,6 +795,10 @@ uint32_t CustomizeMeasureVolage( uint32_t channel )
 ### 服务平台 (Node-red)
 
 ​	Node-RED 是构建物联网应用程序的一个强大工具，其重点是简化代码块的“连接”以执行任务。它使用可视化编程方法，允许开发人员将预定义的代码块（称为“节点”，Node）连接起来执行任务。连接的节点，通常是输入节点、处理节点和输出节点的组合，当它们连接在一起时，构成一个“流”(Flows)。
+
+<p align="right">
+    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+</p>
 
 #### 树莓派(Node-RED)
 
