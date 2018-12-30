@@ -9,13 +9,18 @@
 
 主要涉及`LoRa`、`SX1301`、`SX1278`、`STM32L151`、`Raspberry PI`、`Node.js`
 
+<p align="right">
+    🚀 <a href="#项目概述" target="_blank">回到顶部</a> | 
+    🌾 <a href="README.md">English</a>
+</p>
+
 ## 功能特性
 
-* [ ] LoRaWAN 系统 10km覆盖 🛫
+* [x] LoRaWAN 系统 10km覆盖 🛫
 * [x] 支持实时追踪 🔎
 * [x] 实时数据 🕔
 * [x] 水质监测（浊度、PH值、水温）🌡
-* [ ] 监测中心（预警、统计）📈
+* [x] 监测中心（预警、统计）📈
 
 * [一、相关概念](#相关概念)
   * [LoRa与LoRaWAN](#LoRa与LoRaWAN)
@@ -24,7 +29,7 @@
   * [参数作用](#参数作用)
 * [三、系统搭建](#系统搭建)
   * [网关(Raspberry PI)](#网关(Raspberry PI))
-    * [安装 树莓派 系统](#安装 树莓派 系统)
+    * [安装 树莓派 系统](#安装树莓派系统)
     * [启动 SX1301 集中器](#启动 SX1301 集中器)
     * [增添 ME909s-821 4G模块](#增添 ME909s-821 4G模块)
   * [节点(STM32L151)](#节点(STM32L151))
@@ -32,9 +37,8 @@
     * [外设](#外设)
 * [四、上位机](#上位机)
   * [服务器 (The Things Network)](#服务器 (The Things Network))
-    * [服务平台 (Node.js)](#服务平台 (Node.js))
-    * [服务平台 (Node-red)](#服务平台 (Node-red))
-  * 的
+  * [服务平台 (Node.js)](#服务平台 (Node.js))
+  * [服务平台 (Node-red)](#服务平台 (Node-red))
 * [五、其它](#其它)
   * [Q&A](#Q&A)
   * 
@@ -122,6 +126,10 @@ OTAA（over-the-air activation）
 ## 关键参数
 
 ​	通过调整关键参数：最终在带宽占用、数据速率、链路预算改善以及抗干扰性之间达到最佳平衡，总的来说：最重要的是**`扩频因子(SF)`**，**`编码率(CR)`**，**`带宽(BW)`**，**`信噪比(SNR)`**，**`接收的信号强度指示(RSSI)`**，**`等效全向辐射功率(EIRP)`**，**`速率自适应(ADR)`**，**`正交可变扩频因子(OVSF)`**
+
+<p align="right">
+    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+</p>
 
 ### 参数作用
 
@@ -221,13 +229,17 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 
 ## 系统搭建
 
-[回到顶部](#项目概述)
+​	项目采用以树莓派作为核心处理器，SX1301作为网关集中器的LoRaWAN网关系统。在多次试验与改进后，以LoRaWAN网关作为信息处理的中心，远程站点上具有LoRa协议的边界设备为节点，组成了在低功率广域网内的传感器网络，以单向通讯机制完成数据采集，以无线局域网方式完成采集数据上行服务器。[展示1](#第一代网关展示)
+
+<p align="right">
+    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+</p>
 
 ### 网关(Raspberry PI)
 
-LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构中，LoRa网关是一个透明的中继，连接前端终端设备和后端中央服务器。网关与服务器通过标准IP连接，而终端设备采用单跳与一个或多个网关通信，所有的节点均是双向通信。
+​	LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构中，LoRa网关是一个透明的中继，连接前端终端设备和后端中央服务器。网关与服务器通过标准IP连接，而终端设备采用单跳与一个或多个网关通信，所有的节点均是双向通信。
 
-#### 安装 树莓派 系统
+#### 安装树莓派系统
 
 - 磁盘写入工具：etcher
 
@@ -330,6 +342,10 @@ LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构�
 
 
 #### 增添 ME909s-821 4G模块
+
+<p align="right">
+    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+</p>
 
 ​	由于项目需求，LoRaWAN网关必须安装到郊外，意味着Raspberry PI 无法使用WIFI联网，目前的代替方案是：Huawei ME909s-821 4G模块。话不多说，Raspberry PI 开始：
 
@@ -547,8 +563,7 @@ LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构�
     🚀 <a href="#项目概述" target="_blank">回到顶部</a> | 
     🌾 <a href="README.md">English</a>
 </p>
-
-### 服务器 (The Things Network)
+服务器 (The Things Network)
 
 [The Things Network](https://console.thethingsnetwork.org/applications/suvan/data)
 
@@ -565,8 +580,9 @@ LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构�
 | 07   |  96  | Turbidity 水质浊度   | NTU      |
 | 08   |  97  | COD 化学需氧量       | mg/L     |
 
-
 ### 服务平台 (Node.js)
+
+​	项目采用Node.js和Express框架设计，不仅缩短了平台的开发周期，并且较广泛的兼容各种管理终端。在基于阿里云服务器的平台下，完成了融合各种异构网络接口为一体的初步目标。实现了自动获取节点传感器实时监测数据，在平台后端对数据进行分析处理，通过HTTP协议展示到前端界面。Node.js的响应速度快、高并发、吞吐率高的特点能够使平台稳定的运行，并良好的支持用户的各种动作。
 
 #### Ubuntu 配置Node.js环境
 
@@ -704,6 +720,10 @@ sudo reboot
 
 #### 阿里云 (Node-RED)
 
+<p align="right">
+    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+</p>
+
 安装Node-red
 
 
@@ -735,6 +755,10 @@ Manage palette，安装 node-red-dashboard & node-red-node-pi-gpiod
 
 
 ## 其它
+
+<p align="right">
+    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+</p>
 
 ### Q&A
 
