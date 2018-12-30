@@ -9,43 +9,41 @@
 
 主要涉及`LoRa`、`SX1301`、`SX1278`、`STM32L151`、`Raspberry PI`、`Node.js`
 
-    🛠 <a href="#系统搭建" target="_blank">系统搭建</a> | 
-    🚂 <a href="#第一代网关展示" target="_blank">系统展示</a> | 
-    🌚 <a href="" target="_blank">官方文档</a> | 
-    ✨ <a href="" target="_blank">喜欢我们</a> |
-    🌾 <a href="README_EN.md">English</a>
-***
-
-
-
 ## 功能特性
 
-* [ ] LoRaWAN 系统 10km覆盖
-* [x] 支持实时追踪
-* [x] 实时数据
-* [x] 水质监测（浊度、PH值、水温）
-* [ ] 监测中心（预警、统计）
-
-
+* [ ] LoRaWAN 系统 10km覆盖 🛫
+* [x] 支持实时追踪 🔎
+* [x] 实时数据 🕔
+* [x] 水质监测（浊度、PH值、水温）🌡
+* [ ] 监测中心（预警、统计）📈
 
 * [一、相关概念](#相关概念)
   * [LoRa与LoRaWAN](#LoRa与LoRaWAN)
+  * [LoRaWAN 网路架构的特点](#LoRaWAN 网路架构的特点)
 * [二、关键参数](#关键参数)
   * [参数作用](#参数作用)
 * [三、系统搭建](#系统搭建)
-  * 
+  * [网关(Raspberry PI)](#网关(Raspberry PI))
+    * [安装 树莓派 系统](#安装 树莓派 系统)
+    * [启动 SX1301 集中器](#启动 SX1301 集中器)
+    * [增添 ME909s-821 4G模块](#增添 ME909s-821 4G模块)
+  * [节点(STM32L151)](#节点(STM32L151))
+    * [主控](#主控)
+    * [外设](#外设)
 * [四、上位机](#上位机)
+  * [服务器 (The Things Network)](#服务器 (The Things Network))
+    * [服务平台 (Node.js)](#服务平台 (Node.js))
+    * [服务平台 (Node-red)](#服务平台 (Node-red))
+  * 的
+* [五、其它](#其它)
+  * [Q&A](#Q&A)
   * 
+  * [第一代网关展示](#第一代网关展示)
+  * [第二代网关展示](#第二代网关展示)
 
-[TOC]
-
-
-
-## 1. 相关概念
+## 相关概念
 
 ​	一些基本概念需要知道，总的来说：LoRa与LoRaWAN、LoRaWAN的Class A,B,C、LoRaWAN的两种入网方式
-
-
 
 ### LoRa与LoRaWAN
 
@@ -63,7 +61,7 @@
 
 
 
-#### LoRaWAN的Class A、Class B、Class C
+#### LoRaWAN的三种模式
 
 - Class A（可双向通讯的终端装置）即时性最好
 
@@ -83,7 +81,7 @@
 
   C 类对 server 与终端装置通讯带来最低的延迟 (latency)，所以即时性最好，但消耗功率最高
 
-**项目中使用最低功耗的Class A**
+  > **项目中使用最低功耗的Class A**
 
 #### LoRaWAN的两种入网方式
 
@@ -98,31 +96,21 @@ OTAA（over-the-air activation）
 - 接着由 End Device 发起请求，进行入网程序。
 - 过程中如果失去 session context，必须重新跑 Join Procedure。
 
-**项目中使用OTAA**
+  > **项目中使用OTAA**
 
-#### [LoRaWAN 网路架构的特点](http://www.rfsister.com/article/23589807.html)
-
-- [x] 采用星状拓朴，与网状网络架构相比，它是具有最低延迟的网络结构。
+### LoRaWAN 网路架构的特点
 
 - [x] 终端点的通讯是双向的 (bi-directional)
-
 - [x] LoRaWAN 数据速率可以从 0.3 kbps 到 50 kbps
-
 - [x] 扩频技术 (同一**Channel**中，以不同的**SF**切割通道做**multiple access**，但会影响数据传输率)
-
 - [x] 网关 (gateway) 负责桥接 (bridging) 节点的数据，同时也作为与后端服务连结的网路伺服器 (IP 网路)
-
 - [x] 数据速率的高低与通讯距离之间具有取舍关系
-
 - [x] 自适应速率 (adaptive data rate, ADR)
-
 - [x] LoRaWAN 的网路伺服器可为个别装置设定数据速率，以最佳化电池效率及网路容量
-
 - [x] LoRa使用扩频调制技术，可解调低于20 dB的噪声，这确保了高灵敏度和可靠的网络连接
-
 - [x] 采用不同扩频因子就可以改变扩频系统的传输速率，且可变的扩频因子提高了整个网络的系统容量
-
-- [x] 采用不同扩频因子的信号可以在一个信道中共存。与固定速率的FSK系统相比，LoRa协议的星形拓扑结构消除了同步开销和跳数，因而降低了功耗
+- [x] 采用不同扩频因子的信号可以在一个信道中共存。与固定速率的FSK系统相比，LoRa协议的星形拓扑结构消除了同步开销和跳数，因而降低了功耗。
+- [ ] 采用星状拓朴，与网状网络架构相比，它是具有最低延迟的网络结构。
 
 
 
@@ -233,11 +221,13 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 
 ## 系统搭建
 
+[回到顶部](#项目概述)
+
 ### 网关(Raspberry PI)
 
 LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构中，LoRa网关是一个透明的中继，连接前端终端设备和后端中央服务器。网关与服务器通过标准IP连接，而终端设备采用单跳与一个或多个网关通信，所有的节点均是双向通信。
 
-#### 安装 LoRa 网关
+#### 安装 树莓派 系统
 
 - 磁盘写入工具：etcher
 
@@ -335,9 +325,11 @@ LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构�
   sudo reboot
   ```
 
-#### 启动 SX1301 脚本
+#### 启动 SX1301 集中器
 
-#### 华为 ME909s-821
+
+
+#### 增添 ME909s-821 4G模块
 
 ​	由于项目需求，LoRaWAN网关必须安装到郊外，意味着Raspberry PI 无法使用WIFI联网，目前的代替方案是：Huawei ME909s-821 4G模块。话不多说，Raspberry PI 开始：
 
@@ -508,7 +500,7 @@ LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构�
   sudo wvdial
   ```
 
-#### 玻璃钢天线
+#### 升级 玻璃钢 天线
 
 
 
@@ -516,46 +508,51 @@ LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构�
 
 ### 节点(STM32L151)
 
-#### 主机板
+#### 主控
 
-##### 普通版 (WisNode)
+- 普通版 (WisNode)
 
-无论普通还是升级，网关配置完成后的第一步：填appkey
+  无论普通还是升级，网关配置完成后的第一步：填appkey
 
-对应TTN的设置，修改：LORAWAN_DEVICE_EUI 与 LORAWAN_APPLICATION_KEY
+  对应TTN的设置，修改：LORAWAN_DEVICE_EUI 与 LORAWAN_APPLICATION_KEY
 
-```c
-#define LORAWAN_DEVICE_EUI                          { IEEE_OUI, 0xFF, 0xFE, 0xFD, 0xFC, 0x02 }
-																										//Modifications in the case of mass production
-/*!	
- * Application IEEE EUI (big endian)
- */
-#define LORAWAN_APPLICATION_EUI                     { 0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x88, 0xA8 }
-                                                     //70b3d57ef00046a4   70B3D57E D0007DFA
-/*!
- * AES encryption/decryption cipher application key
- */
-#define LORAWAN_APPLICATION_KEY                     { 0x73, 0xB6, 0x49, 0xCD, 0xA4, 0x90, 0x1E, 0x9F, 0xBC, 0xE5, 0xCD, 0x68, 0x68, 0xB6, 0x14, 0xC8 }
-                                                     //Modifications in the case of mass production
-```
+  ```c
+  #define LORAWAN_DEVICE_EUI                          { IEEE_OUI, 0xFF, 0xFE, 0xFD, 0xFC, 0x02 }
+  																										//Modifications in the case of mass production
+  /*!	
+   * Application IEEE EUI (big endian)
+   */
+  #define LORAWAN_APPLICATION_EUI                     { 0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x88, 0xA8 }
+                                                       //70b3d57ef00046a4   70B3D57E D0007DFA
+  /*!
+   * AES encryption/decryption cipher application key
+   */
+  #define LORAWAN_APPLICATION_KEY                     { 0x73, 0xB6, 0x49, 0xCD, 0xA4, 0x90, 0x1E, 0x9F, 0xBC, 0xE5, 0xCD, 0x68, 0x68, 0xB6, 0x14, 0xC8 }
+                                                       //Modifications in the case of mass production
+  ```
 
-##### 升级版 (Tracker Node)
+- 升级版 (Tracker Node)
 
-#### 外围
+#### 外设
 
-##### [浊度传感器](https://item.taobao.com/item.htm?spm=a1z09.2.0.0.593e2e8dtuesUp&id=530303920152&_u=eo8d3095bd5)
+- [浊度传感器](https://item.taobao.com/item.htm?spm=a1z09.2.0.0.593e2e8dtuesUp&id=530303920152&_u=eo8d3095bd5)
 
-##### PH计传感器
+- PH计传感器
 
-##### 温度传感器
+- 温度传感器
 
 ## 上位机
 
-### [服务器 (The Things Network)](https://console.thethingsnetwork.org/applications/suvan/data)
+<p align="right">
+    🚀 <a href="#项目概述" target="_blank">回到顶部</a> | 
+    🌾 <a href="README.md">English</a>
+</p>
 
-#### [Payload结构](https://mydevices.com/cayenne/docs/lora/#lora-cayenne-low-power-payload)
+### 服务器 (The Things Network)
 
-#### 数据类型
+[The Things Network](https://console.thethingsnetwork.org/applications/suvan/data)
+
+[Payload结构](https://mydevices.com/cayenne/docs/lora/#lora-cayenne-low-power-payload)：数据类型
 
 | 通道 | 类型 | Object               | 量纲     |
 | ---- | :--: | -------------------- | -------- |
@@ -568,45 +565,10 @@ LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构�
 | 07   |  96  | Turbidity 水质浊度   | NTU      |
 | 08   |  97  | COD 化学需氧量       | mg/L     |
 
-### 阿里云VPS
-
-##### [CentOS 7 安装 MATE 桌面环境](http://blog.csdn.net/m0_37876745/article/details/78188848)
-
-- 安装 X Window System
-
-  ```shell
-  yum groups install "X Window System"
-  ```
-
-- 安装 MATE Desktop
-
-  ```powershell
-  yum groups install "MATE Desktop"
-  ```
-
-- 设置默认通过桌面环境启动服务器
-
-  ```shell
-  systemctl set-default graphical.target
-  ```
-
-- 重启服务器
-
-  ```shell
-  reboot
-  ```
-
-  ```shell
-  systemctl set-default multi-user.target  //设置成命令模式
-  systemctl set-default graphical.target  //设置成图形模式
-  ```
-
-
-
 
 ### 服务平台 (Node.js)
 
-#### 局域网 Ubuntu 配置Node.js环境
+#### Ubuntu 配置Node.js环境
 
 - 安装 Node.js
 
@@ -653,15 +615,46 @@ LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构�
 
   多谢 3-304 马斌老师！
 
-#### 阿里云 CentOS 配置Node.js环境
+#### CentOS 配置Node.js环境
+
+#### [CentOS 7 安装 MATE 桌面环境](http://blog.csdn.net/m0_37876745/article/details/78188848)
+
+- 安装 X Window System
+
+  ```shell
+  yum groups install "X Window System"
+  ```
+
+- 安装 MATE Desktop
+
+  ```powershell
+  yum groups install "MATE Desktop"
+  ```
+
+- 设置默认通过桌面环境启动服务器
+
+  ```shell
+  systemctl set-default graphical.target
+  ```
+
+- 重启服务器
+
+  ```shell
+  reboot
+  ```
+
+  ```shell
+  systemctl set-default multi-user.target  //设置成命令模式
+  systemctl set-default graphical.target  //设置成图形模式
+  ```
 
 
 
 
 
-### 简易平台(Node-RED)
+### 服务平台 (Node-red)
 
-#### 本地 Node-RED(Raspberry PI)
+#### 树莓派 (Node-RED)
 
 树莓派本身预安装Node-RED，所以只需要[update](https://www.ibm.com/developerworks/cn/cloud/library/cl-cn-bluemix-nodered/index.html)
 
@@ -709,7 +702,7 @@ sudo systemctl enable nodered.service
 sudo reboot
 ```
 
-#### 云端 Node-RED (阿里云)
+#### 阿里云 (Node-RED)
 
 安装Node-red
 
@@ -741,7 +734,7 @@ Manage palette，安装 node-red-dashboard & node-red-node-pi-gpiod
 
 
 
-## 五、其它
+## 其它
 
 ### Q&A
 
@@ -778,4 +771,6 @@ SNR越大，意味着通信链路预算值越高，也意味着传输距离更�
 
 
 
-[回到顶部](#项目概述)
+<p align="right">
+    🚀 <a href="#项目概述" target="_blank">回到顶部</a> | 
+</p>
