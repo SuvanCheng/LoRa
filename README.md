@@ -202,7 +202,7 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 最方便的计算方法当然是官方的计算器：LoRa Modem Calculator Tool
 所有参数一目了然，非常方便：
 
-![](/img/LoRa Modem Calculator Tool.png)
+![](/img/LoRa_Modem_Calculator_Tool.png)
 
 无线电传输公式
 $$
