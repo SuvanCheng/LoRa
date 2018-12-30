@@ -9,13 +9,11 @@
 
 主要涉及`LoRa`、`SX1301`、`SX1278`、`STM32L151`、`Raspberry PI`、`Node.js`
 
-    🛠 <a href="#三、系统搭建" target="_blank">系统搭建</a> | 
-    🚂 <a href="#第一代网关展示" target="_blank">系统展示</a> | 
-    🌚 <a href="" target="_blank">官方文档</a> | 
-    ✨ <a href="" target="_blank">喜欢我们</a> |
-    🌾 <a href="README_EN.md">English</a>
-***
-
+    🛠 <a href="#三、系统搭建" target="_blank">Setup</a> | 
+    🚂 <a href="#第一代网关展示" target="_blank">Show</a> | 
+    🌚 <a href="" target="_blank">Document</a> | 
+    ✨ <a href="" target="_blank">Like</a> |
+    🌾 <a href="README.md">中文</a>
 
 
 ## 功能特性
