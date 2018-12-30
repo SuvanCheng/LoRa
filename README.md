@@ -1,47 +1,45 @@
 # LoRa个人学习笔记
 重拾LoRa，将离线笔记搬运到 GitHub 上来，也算是总结一下这个项目。🚩
 
-## 项目概述
-
-这是大三开始的项目，书面称作 **`城市河道排污在线监测系统`**
-
-通常我叫做**`蜻蜓点水`**项目，因为内容虚胖，多是浮光掠影。😀
-
-主要涉及`LoRa`、`SX1301`、`SX1278`、`STM32L151`、`Raspberry PI`、`Node.js`
-
 <p align="right">
-    🚀 <a href="#项目概述" target="_blank">回到顶部</a> | 
-    🌾 <a href="README.md">English</a>
+    🌾 <a href="README_EN.md">English</a>
 </p>
 
-## 功能特性
+## 概述
 
-* [x] LoRaWAN 系统 10km覆盖 🛫
-* [x] 支持实时追踪 🔎
-* [x] 实时数据 🕔
-* [x] 水质监测（浊度、PH值、水温）🌡
+这是大三开始的项目，书面称作 **`城市河道排污在线监测系统`**
+通常我叫做**`蜻蜓点水`**项目，因为内容虚胖，多是浮光掠影。😀
+主要涉及`LoRa`、`SX1301`、`SX1278`、`STM32L151`、`Raspberry PI`、`Node.js`
+* [x] 水质监测（浊度、PH值、水温）💧
+* [x] LoRaWAN 系统 10 km覆盖 🛫
 * [x] 监测中心（预警、统计）📈
+* [x] 实时追踪 🔎
+## 目录
 
 * [一、相关概念](#相关概念)
   * [LoRa与LoRaWAN](#LoRa与LoRaWAN)
   * [LoRaWAN 网路架构的特点](#LoRaWAN网路架构的特点)
 * [二、关键参数](#关键参数)
   * [参数作用](#参数作用)
+  * [参数修改](#参数修改)
 * [三、系统搭建](#系统搭建)
-  * [网关(Raspberry PI)](#网关(Raspberry PI))
-    * [安装 树莓派 系统](#安装树莓派系统)
-    * [启动 SX1301 集中器](#启动SX1301集中器)
-    * [增添 ME909s-821 4G模块](#增添ME909s-821模块)
-  * [节点(STM32L151)](#节点(STM32L151))
-    * [主控](#主控)
+  * [LoRaWAN网关](#LoRaWAN网关)
+    * [安装树莓派系统](#安装树莓派系统)
+    * [启动SX1301集中器](#启动SX1301集中器)
+    * [ME909s-821 4G模块](#增添ME909s-821模块)
+  * [LoRa节点](#LoRa节点)
+    * [主控STM32L151](#主控STM32L151)
     * [外设](#外设)
 * [四、上位机](#上位机)
-  * [服务器 (The Things Network)](#服务器 (The Things Network))
   * [服务平台 (Node.js)](#服务平台 (Node.js))
+    * [Ubuntu配置Node.js环境](#Ubuntu配置Node.js环境)
+    * [CentOS配置Node.js环境](#CentOS配置Node.js环境)
+    * [CentOS安装MATE桌面环境](#CentOS安装MATE桌面环境)
   * [服务平台 (Node-red)](#服务平台 (Node-red))
+    * [树莓派(Node-RED)](#树莓派(Node-RED))
+    * [阿里云(Node-RED)](#阿里云(Node-RED))
 * [五、其它](#其它)
   * [Q&A](#Q&A)
-  * 
   * [第一代网关展示](#第一代网关展示)
   * [第二代网关展示](#第二代网关展示)
 
@@ -68,37 +66,28 @@
 #### LoRaWAN的三种模式
 
 - Class A（可双向通讯的终端装置）即时性最好
-
   用于需要以最低功耗操作的终端装置。
-
-  这种装置常常在它送出 uplink 之后，只需要与 server 端进行很短暂的 downlink 通讯 (例如只收个ACK 而已)
-
-  在任何其他时间，从 server downlink 必须等到下一次的 scheduled uplink (所以通讯没办法很即时，例如下一次的 scheduled uplink 可能是在128秒之后)
+  这种装置常常在它送出 uplink 之后，只需要与 server 端进行很短暂的 downlink 通讯 (例如只收个ACK 而已)在任何其他时间，从 server downlink 必须等到下一次的 scheduled uplink (所以通讯没办法很即时，例如下一次的 scheduled uplink 可能是在128秒之后)
 
 - Class B（可双向通讯的终端装置，但有 scheduled receive slots）
-
   相较于 A 类的随机 receive windows，Class B 的装置会在排程的时间打开一个额外的接收窗。为了让终端装置在排程时间打开它的 receive window，它需要从 gateway 接收一个用于时间同步的 Beacon (如此一来，server 就能知道终端装置何时在 listening)，相较于 A 类会更即时。
 
 - Class C（可双向通讯的终端装置，尽可能安排最多的 receive slots）
-
   C 类的终端装置是几乎连续地开着 receive windows，只有在发送时才会关闭接收视窗
-
   C 类对 server 与终端装置通讯带来最低的延迟 (latency)，所以即时性最好，但消耗功率最高
 
   > **项目中使用最低功耗的Class A**
 
 #### LoRaWAN的两种入网方式
 
-ABP（activation by personalization）
+- ABP（activation by personalization）
+  DevAddr、NwkSKey 与 AppSKey 是直接储存在装置上的；
+  每个装置都有自己的 NwkSKey 与 AppSKey，这样泄漏一个装置的密钥，不会牵连到其他装置。
 
-- DevAddr、NwkSKey 与 AppSKey 是直接储存在装置上的；
-- 每个装置都有自己的 NwkSKey 与 AppSKey，这样泄漏一个装置的密钥，不会牵连到其他装置。
-
-OTAA（over-the-air activation）
-
-- DevEUI、AppEUI、AppKey 金钥这三个东西，AppKey 的目的是为了产生 NwkSKey 与 AppSKey。
-- 接着由 End Device 发起请求，进行入网程序。
-- 过程中如果失去 session context，必须重新跑 Join Procedure。
+- OTAA（over-the-air activation）
+  DevEUI、AppEUI、AppKey 金钥这三个东西，AppKey 的目的是为了产生 NwkSKey 与 AppSKey。
+  接着由 End Device 发起请求，进行入网程序。
+  过程中如果失去 session context，必须重新跑 Join Procedure。
 
   > **项目中使用OTAA**
 
@@ -114,14 +103,7 @@ OTAA（over-the-air activation）
 - [x] LoRa使用扩频调制技术，可解调低于20 dB的噪声，这确保了高灵敏度和可靠的网络连接
 - [x] 采用不同扩频因子就可以改变扩频系统的传输速率，且可变的扩频因子提高了整个网络的系统容量
 - [x] 采用不同扩频因子的信号可以在一个信道中共存。与固定速率的FSK系统相比，LoRa协议的星形拓扑结构消除了同步开销和跳数，因而降低了功耗。
-- [ ] 采用星状拓朴，与网状网络架构相比，它是具有最低延迟的网络结构。
-
-
-
-
-
-
-
+- [x] 采用星状拓朴，与网状网络架构相比，它是具有最低延迟的网络结构。
 
 ## 关键参数
 
@@ -225,6 +207,51 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 
 ### 参数修改
 
+​	在`main.c`中，可以修改必要参数，
+
+|                           |                          |                               |
+| ------------------------- | ------------------------ | ----------------------------- |
+| APP_TX_DUTYCYCLE          | 数据传输占空比           |                               |
+| APP_TX_DUTYCYCLE_RND      | 数据传输占空比的随机延迟 |                               |
+| LORAWAN_DEFAULT_DATARATE  | 默认数据速率             |                               |
+| LORAWAN_CONFIRMED_MSG_ON  | LoRaWAN确认消息          |                               |
+| LORAWAN_ADR_ON            | 自适应数据速率           | 启用ADR时，终端设备应该是静态 |
+| LORAWAN_DUTYCYCLE_ON      | ETSI占空比控制启用/禁用  | 仅用于测试                    |
+| LORAWAN_APP_PORT          | LoRaWAN应用程序端口      |                               |
+| LORAWAN_APP_DATA_SIZE     |                          |                               |
+| OVER_THE_AIR_ACTIVATION   | OTAA空中激活             |                               |
+| LORAWAN_APP_DATA_MAX_SIZE | 用户应用数据缓冲区大小   |                               |
+
+```c
+#define APP_TX_DUTYCYCLE                            10000
+#define APP_TX_DUTYCYCLE_RND                        500
+#define LORAWAN_DEFAULT_DATARATE                    DR_0
+#define LORAWAN_CONFIRMED_MSG_ON                    false
+#define LORAWAN_ADR_ON                              1
+#if defined( REGION_EU868 )
+#include "LoRaMacTest.h"
+#define LORAWAN_DUTYCYCLE_ON                        true
+#define LORAWAN_APP_PORT                            2
+#if defined( REGION_CN470 ) || defined( REGION_CN779 ) || defined( REGION_EU433 ) || defined( REGION_EU868 ) || defined( REGION_IN865 ) || defined( REGION_KR920 )
+#define LORAWAN_APP_DATA_SIZE                       16
+#elif defined( REGION_AS923 ) || defined( REGION_AU915 ) || defined( REGION_US915 ) || defined( REGION_US915_HYBRID )
+#define LORAWAN_APP_DATA_SIZE                       11
+#else
+#error "Please define a region in the compiler options."
+#endif
+static uint8_t DevEui[] = LORAWAN_DEVICE_EUI;
+static uint8_t AppEui[] = LORAWAN_APPLICATION_EUI;
+static uint8_t AppKey[] = LORAWAN_APPLICATION_KEY;
+#if( OVER_THE_AIR_ACTIVATION == 0 )
+static uint8_t NwkSKey[] = LORAWAN_NWKSKEY;
+static uint8_t AppSKey[] = LORAWAN_APPSKEY;
+static uint32_t DevAddr = LORAWAN_DEVICE_ADDRESS;
+#endif
+static uint8_t AppPort = LORAWAN_APP_PORT;
+static uint8_t AppDataSize = LORAWAN_APP_DATA_SIZE;
+#define LORAWAN_APP_DATA_MAX_SIZE                           242
+```
+
 
 
 ## 系统搭建
@@ -235,7 +262,7 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
     🚀 <a href="#项目概述" target="_blank">回到顶部</a>
 </p>
 
-### 网关(Raspberry PI)
+### LoRaWAN网关
 
 ​	LoRaWAN网络架构是一个典型的星形拓扑结构，在这个网络架构中，LoRa网关是一个透明的中继，连接前端终端设备和后端中央服务器。网关与服务器通过标准IP连接，而终端设备采用单跳与一个或多个网关通信，所有的节点均是双向通信。
 
@@ -343,11 +370,12 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 
 #### 增添ME909s-821模块
 
+​	由于项目需求，LoRaWAN网关必须安装到郊外，意味着Raspberry PI 无法使用WIFI联网，目前的代替方案是：Huawei ME909s-821
+​	[ME909s系列](http://consumer.huawei.com/solutions/m2m-solutions/cn/products/tech-specs/me909s_821_cn.htm)是Cat4 LTE工业级M2M无线模块，沿用华为LGA封装标准，与MU709s系列 pin-to-pin兼容。同时具有标准Mini PCIe形态，客户选择更具灵活性。ME909s系列支持下行150Mbps，上行50Mbps的传输速率；提供高质量的语音、短信功能；丰富的扩展功能，包括：FOTA、USSD、IPV6/IPV4；内置TCP/IP协议栈；华为扩展AT指令集…
+
 <p align="right">
     🚀 <a href="#项目概述" target="_blank">回到顶部</a>
 </p>
-
-​	由于项目需求，LoRaWAN网关必须安装到郊外，意味着Raspberry PI 无法使用WIFI联网，目前的代替方案是：Huawei ME909s-821 4G模块。话不多说，Raspberry PI 开始：
 
 * 因为无法访问外网，所以首先修改树莓派的更新源
 
@@ -522,11 +550,11 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 
 
 
-### 节点(STM32L151)
+### LoRa节点
 
 ​	STM32L151/152器件利用Cortex-M3内核和频率介于32 kHz至32 MHz的CPU时钟扩展了超低功耗理念，并且不会降低性能。除了动态运行和低功耗运行模式以外，还有另外2种超低功耗模式为您带来了极低的功耗，同时还能保持RTC、后备寄存器内容与低压检测器的工作。项目主要使用的特性为片上集成的快速12位1 MSPS ADC。
 
-#### 主控
+#### 主控STM32L151
 
 - 普通版 (WisNode)
 
@@ -551,13 +579,106 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 
 - 升级版 (Tracker Node)
 
+
 #### 外设
+
+​	
+
+- u-blox GPS芯片 MAX-7Q
+
+  亮点：微型LCC封装；低功耗；UART 接口
+
+  ```C
+  case 2: {
+  	ret = GpsGetLatestGpsPositionDouble(&latitude, &longitude);
+  	altitudeGps = GpsGetLatestGpsAltitude(); // in m
+  	//printf("[Debug]: latitude: %f, longitude: %f , altitudeGps: %d \n", latitude, longitude, altitudeGps);
+  	printf("GpsGetLatestGpsPositionDouble ret = %d\r\n", ret);
+  	if (ret == SUCCESS) {
+  		AppData[0] = 0x01;	//Data Channel
+  		AppData[1] = 0x88;	//Type: 88 = GPSLocation
+  		AppData[2] = ((int32_t) (latitude * 10000) >> 16) & 0xFF;
+  		AppData[3] = ((int32_t) (latitude * 10000) >> 8) & 0xFF;
+  		AppData[4] = ((int32_t) (latitude * 10000)) & 0xFF;
+  		AppData[5] = ((int32_t) (longitude * 10000) >> 16) & 0xFF;
+  		AppData[6] = ((int32_t) (longitude * 10000) >> 8) & 0xFF;
+  		AppData[7] = ((int32_t) (longitude * 10000)) & 0xFF;
+  		AppData[8] = ((altitudeGps * 100) >> 16) & 0xFF;
+  		AppData[9] = ((altitudeGps * 100) >> 8) & 0xFF;
+  		AppData[10] = (altitudeGps * 100) & 0xFF;
+  		AppDataSize = 11;
+  	} else {
+  		AppDataSize = 0;
+  		GPS_GETFAIL = SUCCESS;
+  	}
+  }
+  ```
+
+
+​	所有外设均为ADC采样，测温范围-20℃～+80℃，测温精度±0.5℃；测PH 范围 0.0～14.0PH，测PH 精度，±0.01PH；下面为自定义的一段ADC采样函数
+
+```c
+uint32_t CustomizeMeasureVolage( uint32_t channel )
+{
+    uint16_t vdd = 0;
+    uint16_t vref = VREFINT_CAL;
+    uint16_t vdiv = 0;
+    uint16_t Voltage = 0;
+
+    vdiv = AdcReadChannel( &Adc, channel );
+    //vref = AdcReadChannel( &Adc, ADC_CHANNEL_VREFINT );
+
+    vdd = ( float )FACTORY_POWER_SUPPLY * ( float )VREFINT_CAL / ( float )vref;
+    Voltage = vdd * ( ( float )vdiv / ( float )ADC_MAX_VALUE );
+
+    //                                 vDiv
+    // Divider bridge  VBAT <-> 100k -<--|-->- 150k <-> GND => vBat = (5 * vDiv )/3
+    Voltage = (5 * Voltage )/3;
+    return Voltage;
+}
+```
+
+
 
 - [浊度传感器](https://item.taobao.com/item.htm?spm=a1z09.2.0.0.593e2e8dtuesUp&id=530303920152&_u=eo8d3095bd5)
 
+  ```c
+  vdd3 = CustomizeMeasureVolage(EXTERNAL_ADC_PB12); //黑色 浊度
+  AppData[4] = 0x03;	//Data Channel
+  AppData[5] = 0x03;	
+  AppData[6] = (vdd3 >> 8) & 0xFF; //@Suvan|| ADC_CHANNEL_18 EXTERNAL_ADC_PB12
+  AppData[7] = (vdd3) & 0xFF;
+  ```
+
 - PH计传感器
 
+  ```c
+  vdd2 = CustomizeMeasureVolage(EXTERNAL_ADC_PA1);//绿色 PH
+  vdd2 = vdd2*0.028;
+  AppData[0] = 0x02;	//Data Channel
+  AppData[1] = 0x03;	
+  AppData[2] = (vdd2*10 >> 8) & 0xFF; //@Suvan|| ADC_CHANNEL_2 EXTERNAL_ADC_PA1
+  AppData[3] = (vdd2*10) & 0xFF;
+  ```
+
 - 温度传感器
+
+  ```c
+  vdd4 = CustomizeMeasureVolage(BAT_LEVEL_CHANNEL);//白色 温度
+  vdd4 = vdd4*0.2-200;
+  AppData[8] = 0x04;	//Data Channel
+  AppData[9] = 0x03;	
+  AppData[10] = (vdd4*10 >> 8) & 0xFF; //@Suvan|| ADC_CHANNEL_20 BAT_LEVEL_CHANNEL
+  AppData[11] = (vdd4*10) & 0xFF; 
+  AppDataSize = 12;
+  ```
+
+
+
+
+
+
+
 
 ## 上位机
 
@@ -586,7 +707,7 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 
 ​	项目采用Node.js和Express框架设计，不仅缩短了平台的开发周期，并且较广泛的兼容各种管理终端。在基于阿里云服务器的平台下，完成了融合各种异构网络接口为一体的初步目标。实现了自动获取节点传感器实时监测数据，在平台后端对数据进行分析处理，通过HTTP协议展示到前端界面。Node.js的响应速度快、高并发、吞吐率高的特点能够使平台稳定的运行，并良好的支持用户的各种动作。
 
-#### Ubuntu 配置Node.js环境
+#### Ubuntu配置Node.js环境
 
 - 安装 Node.js
 
@@ -633,9 +754,11 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 
   多谢 3-304 马斌老师！
 
-#### CentOS 配置Node.js环境
+#### CentOS配置Node.js环境
 
-#### [CentOS 7 安装 MATE 桌面环境](http://blog.csdn.net/m0_37876745/article/details/78188848)
+
+
+#### CentOS安装MATE桌面环境
 
 - 安装 X Window System
 
@@ -672,7 +795,9 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 
 ### 服务平台 (Node-red)
 
-#### 树莓派 (Node-RED)
+​	Node-RED 是构建物联网应用程序的一个强大工具，其重点是简化代码块的“连接”以执行任务。它使用可视化编程方法，允许开发人员将预定义的代码块（称为“节点”，Node）连接起来执行任务。连接的节点，通常是输入节点、处理节点和输出节点的组合，当它们连接在一起时，构成一个“流”(Flows)。
+
+#### 树莓派(Node-RED)
 
 树莓派本身预安装Node-RED，所以只需要[update](https://www.ibm.com/developerworks/cn/cloud/library/cl-cn-bluemix-nodered/index.html)
 
@@ -680,7 +805,7 @@ LoRa 的传输率可以自由调整，传输率越低，传输的距离可以越
 update-nodejs-and-nodered
 ```
 
-
+update成功会出现打出以下message
 
 ```shell
 All done.
@@ -689,25 +814,22 @@ All done.
   Then point your browser to localhost:1880 or http://{your_pi_ip-address}:1880
 ```
 
-
+安装`node-red-admin`到【全局目录】
 
 ```shell
 cd ~/.node-red
 sudo npm install -g node-red-admin
 ```
 
-
+生成个人密码
 
 ```shell
 node-red-admin hash-pw
-```
-
-把密码记好
-
-```shell
 Password: 
 $2a$08$ysZq7ivCwbQBNCCsvSJ89u1IUzskYfchCnoLVIm7KySLIqI5vqvDu
 ```
+
+配置`node-red`
 
 ```
 nano ~/.node-red/settings.js
@@ -720,15 +842,13 @@ sudo systemctl enable nodered.service
 sudo reboot
 ```
 
-#### 阿里云 (Node-RED)
+#### 阿里云(Node-RED)
 
 <p align="right">
     🚀 <a href="#项目概述" target="_blank">回到顶部</a>
 </p>
 
-安装Node-red
-
-
+安装`Node-red`
 
 注意，阿里云需要打开1880端口
 
@@ -743,8 +863,6 @@ sudo reboot
 > 192.168.0.108是树莓派在局域网的IP地址
 
 Manage palette，安装 node-red-dashboard & node-red-node-pi-gpiod
-
-实例
 
 ```json
 [{"id":"7c1e7b4b.da34e4","type":"rpi-gpio out","z":"1fe5d95c.88e647","name":"led","pin":"7","set":true,"level":"0","freq":"100","out":"out","x":810,"y":340,"wires":[]},{"id":"8b812881.120738","type":"ui_switch","z":"1fe5d95c.88e647","name":"","label":"LED","group":"f94ed544.fa12c8","order":0,"width":0,"height":0,"passthru":false,"decouple":"false","topic":"","style":"","onvalue":"true","onvalueType":"bool","onicon":"","oncolor":"","offvalue":"false","offvalueType":"bool","officon":"","offcolor":"","x":430,"y":340,"wires":[["dd1b0223.69643"]]},{"id":"dd1b0223.69643","type":"change","z":"1fe5d95c.88e647","name":"","rules":[{"t":"change","p":"payload","pt":"msg","from":"true","fromt":"bool","to":"1","tot":"num"},{"t":"change","p":"payload","pt":"msg","from":"false","fromt":"bool","to":"0","tot":"num"}],"action":"","property":"","from":"","to":"","reg":false,"x":620,"y":340,"wires":[["7c1e7b4b.da34e4"]]},{"id":"f94ed544.fa12c8","type":"ui_group","z":"","name":"Switch","tab":"d010dc9f.a4fc1","order":1,"disp":true,"width":"6"},{"id":"d010dc9f.a4fc1","type":"ui_tab","z":"","name":"My PI3b","icon":"dashboard","order":1}]
