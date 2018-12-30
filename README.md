@@ -35,7 +35,6 @@
 * [四、上位机](#上位机)
   * [服务平台 (Node.js)](#服务平台 (Node.js))
     * [Ubuntu配置Node.js环境](#Ubuntu配置Node.js环境)
-    * [CentOS配置Node.js环境](#CentOS配置Node.js环境)
     * [CentOS安装MATE桌面环境](#CentOS安装MATE桌面环境)
   * [服务平台 (Node-red)](#服务平台 (Node-red))
     * [树莓派(Node-RED)](#树莓派(Node-RED))
@@ -108,8 +107,9 @@
 ​	通过调整关键参数：最终在带宽占用、数据速率、链路预算改善以及抗干扰性之间达到最佳平衡，总的来说：最重要的是**`扩频因子(SF)`**，**`编码率(CR)`**，**`带宽(BW)`**，**`信噪比(SNR)`**，**`接收的信号强度指示(RSSI)`**，**`等效全向辐射功率(EIRP)`**，**`速率自适应(ADR)`**，**`正交可变扩频因子(OVSF)`**
 
 <p align="right">
-    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+    🚀 <a href="#概述" target="_blank">回到顶部</a>
 </p>
+
 
 ### 定义
 
@@ -264,8 +264,9 @@ static uint8_t AppDataSize = LORAWAN_APP_DATA_SIZE;
 ​	项目采用以树莓派作为核心处理器，SX1301作为网关集中器的LoRaWAN网关系统。在多次试验与改进后，以LoRaWAN网关作为信息处理的中心，远程站点上具有LoRa协议的边界设备为节点，组成了在低功率广域网内的传感器网络，以单向通讯机制完成数据采集，以无线局域网方式完成采集数据上行服务器。[展示1](#第一代网关展示)
 
 <p align="right">
-    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+    🚀 <a href="#概述" target="_blank">回到顶部</a>
 </p>
+
 
 ### LoRaWAN网关
 
@@ -379,8 +380,9 @@ static uint8_t AppDataSize = LORAWAN_APP_DATA_SIZE;
 ​	[ME909s系列](http://consumer.huawei.com/solutions/m2m-solutions/cn/products/tech-specs/me909s_821_cn.htm)是Cat4 LTE工业级M2M无线模块，沿用华为LGA封装标准，与MU709s系列 pin-to-pin兼容。同时具有标准Mini PCIe形态，客户选择更具灵活性。ME909s系列支持下行150Mbps，上行50Mbps的传输速率；提供高质量的语音、短信功能；丰富的扩展功能，包括：FOTA、USSD、IPV6/IPV4；内置TCP/IP协议栈；华为扩展AT指令集…
 
 <p align="right">
-    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+    🚀 <a href="#概述" target="_blank">回到顶部</a>
 </p>
+
 
 * 因为无法访问外网，所以首先修改树莓派的更新源
 
@@ -560,8 +562,9 @@ static uint8_t AppDataSize = LORAWAN_APP_DATA_SIZE;
 ​	STM32L151/152器件利用Cortex-M3内核和频率介于32 kHz至32 MHz的CPU时钟扩展了超低功耗理念，并且不会降低性能。除了动态运行和低功耗运行模式以外，还有另外2种超低功耗模式为您带来了极低的功耗，同时还能保持RTC、后备寄存器内容与低压检测器的工作。项目主要使用的特性为片上集成的快速12位1 MSPS ADC。
 
 <p align="right">
-    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+    🚀 <a href="#概述" target="_blank">回到顶部</a>
 </p>
+
 
 #### 主控STM32L151
 
@@ -692,8 +695,9 @@ uint32_t CustomizeMeasureVolage( uint32_t channel )
 ## 上位机
 
 <p align="right">
-    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+    🚀 <a href="#概述" target="_blank">回到顶部</a>
 </p>
+
 
 服务器 (The Things Network)
 
@@ -763,10 +767,6 @@ uint32_t CustomizeMeasureVolage( uint32_t channel )
 
   多谢 3-304 马斌老师！
 
-#### CentOS配置Node.js环境
-
-
-
 #### CentOS安装MATE桌面环境
 
 - 安装 X Window System
@@ -807,8 +807,9 @@ uint32_t CustomizeMeasureVolage( uint32_t channel )
 ​	Node-RED 是构建物联网应用程序的一个强大工具，其重点是简化代码块的“连接”以执行任务。它使用可视化编程方法，允许开发人员将预定义的代码块（称为“节点”，Node）连接起来执行任务。连接的节点，通常是输入节点、处理节点和输出节点的组合，当它们连接在一起时，构成一个“流”(Flows)。
 
 <p align="right">
-    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+    🚀 <a href="#概述" target="_blank">回到顶部</a>
 </p>
+
 
 #### 树莓派(Node-RED)
 
@@ -858,8 +859,9 @@ sudo reboot
 #### 阿里云(Node-RED)
 
 <p align="right">
-    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+    🚀 <a href="#概述" target="_blank">回到顶部</a>
 </p>
+
 
 安装`Node-red`
 
@@ -890,8 +892,9 @@ Manage palette，安装 node-red-dashboard & node-red-node-pi-gpiod
 ## 其它
 
 <p align="right">
-    🚀 <a href="#项目概述" target="_blank">回到顶部</a>
+    🚀 <a href="#概述" target="_blank">回到顶部</a>
 </p>
+
 
 ### Q&A
 
@@ -929,5 +932,5 @@ SNR越大，意味着通信链路预算值越高，也意味着传输距离更�
 
 
 <p align="right">
-    🚀 <a href="#项目概述" target="_blank">回到顶部</a> | 
+    🚀 <a href="#概述" target="_blank">回到顶部</a> | 
 </p>
